@@ -9,12 +9,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
@@ -31,6 +29,12 @@ public class BookController {
     public BookDTO create(@RequestBody @Valid BookDTO dto) {
         Book book = modelMapper.map(dto, Book.class);
         book = service.save(book);
+        return modelMapper.map(book, BookDTO.class);
+    }
+
+    @GetMapping("{id}")
+    public BookDTO get(@PathVariable Long id) {
+        Book book = service.getById(id).get();
         return modelMapper.map(book, BookDTO.class);
     }
 
