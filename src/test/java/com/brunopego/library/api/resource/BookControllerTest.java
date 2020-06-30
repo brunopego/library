@@ -196,4 +196,58 @@ public class BookControllerTest {
 
     }
 
+    @Test
+    @DisplayName("Deve atualizar um livro")
+    public void shouldUpdateBook() throws Exception {
+        // cenário
+        Long id = 1L;
+        Book book = createNewBook();
+        book.setId(id);
+
+        Book bookWithUpdatedInfo = Book.builder().id(1L).author("Bruno").title("Um Livro a Mais").isbn("123").build();
+
+        BDDMockito.given(service.getById(id)).willReturn(Optional.of(book));
+        BDDMockito.given(service.update(book)).willReturn(bookWithUpdatedInfo);
+
+        String json = new ObjectMapper().writeValueAsString(book);
+
+        // execução
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("title").value(bookWithUpdatedInfo.getTitle()))
+                .andExpect(jsonPath("author").value(bookWithUpdatedInfo.getAuthor()))
+                .andExpect(jsonPath("isbn").value(book.getIsbn()));
+    }
+
+    @Test
+    @DisplayName("Deve retornar not found ao tentar atualizar um livro inexistente")
+    public void shouldNotUpdateInexistenBook() throws Exception {
+        // cenário
+        Long id = 1L;
+        Book book = createNewBook();
+        book.setId(id);
+        String json = new ObjectMapper().writeValueAsString(book);
+
+        BDDMockito.given(service.getById(Mockito.anyLong())).willReturn(Optional.empty());
+
+        // execução
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(BOOK_API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
+    }
+
 }
