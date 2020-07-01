@@ -30,12 +30,18 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void delete(Book book) {
-
+        if(book == null || book.getId() == null) {
+            throw new IllegalArgumentException();
+        }
+        repository.delete(book);
     }
 
     @Override
     public Book update(Book book) {
-       return null;
+        if(book == null || book.getId() == null) {
+            throw new IllegalArgumentException();
+        }
+        return repository.save(book);
     }
 
 }

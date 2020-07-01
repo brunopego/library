@@ -109,4 +109,70 @@ public class BookServiceTest {
 
     }
 
+    @Test
+    @DisplayName("Deve deletar um livro")
+    public void shouldDeleteBook() {
+        // cenário
+        Long id = 1L;
+        Book book = createNewBook();
+        book.setId(id);
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(() -> service.delete(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.times(1)).delete(book);
+
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar deletar livro inexistente")
+    public void shouldNotDeleteInexistentBook() {
+        // cenário
+        Book book = new Book();
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.delete(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.never()).delete(book);
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar atualizar livro inexistente")
+    public void shouldNotUpdateInexistentBook() {
+        // cenário
+        Book book = new Book();
+
+        // execução
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> service.update(book));
+
+        // verificação
+        Mockito.verify(repository, Mockito.never()).save(book);
+    }
+
+    @Test
+    @DisplayName("Deve atualizar um livro")
+    public void shouldUpdateBook() {
+        // cenário
+        Long id = 1L;
+
+        Book bookToUpdate = Book.builder().id(id).build();
+
+        Book updatedBook = createNewBook();
+        updatedBook.setId(id);
+
+        Mockito.when(repository.save(bookToUpdate)).thenReturn(updatedBook);
+
+        // execução
+        Book book  = service.update(bookToUpdate);
+
+        // verificação
+        assertThat(book.getId()).isEqualTo(updatedBook.getId());
+        assertThat(book.getAuthor()).isEqualTo(updatedBook.getAuthor());
+        assertThat(book.getTitle()).isEqualTo(updatedBook.getTitle());
+        assertThat(book.getIsbn()).isEqualTo(updatedBook.getIsbn());
+
+    }
+
 }
