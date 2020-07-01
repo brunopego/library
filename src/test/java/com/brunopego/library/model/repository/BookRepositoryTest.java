@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(SpringExtension.class)
@@ -53,6 +55,20 @@ public class BookRepositoryTest {
 
         // verificação
         assertThat(exists).isFalse();
+    }
+
+    @Test
+    @DisplayName("Deve obter livro por id")
+    public void shoudFindBookById() {
+        // cenário
+        Book book = createNewBook();
+        entityManager.persist(book);
+
+        // execução
+        Optional<Book> bookFound = repository.findById(book.getId());
+
+        // verificação
+        assertThat(bookFound.isPresent()).isTrue();
     }
 
 }
