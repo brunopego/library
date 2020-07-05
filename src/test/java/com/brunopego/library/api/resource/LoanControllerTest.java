@@ -1,6 +1,7 @@
 package com.brunopego.library.api.resource;
 
 import com.brunopego.library.api.dto.LoanDTO;
+import com.brunopego.library.exception.BusinessException;
 import com.brunopego.library.model.entity.Book;
 import com.brunopego.library.model.entity.Loan;
 import com.brunopego.library.service.BookService;
@@ -104,6 +105,33 @@ public class LoanControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("errors", Matchers.hasSize(1)))
                 .andExpect(jsonPath("errors[0]").value("Book not found for passed isbn"));
+
+    }
+
+    @Test
+    @DisplayName("Deve retornar erro ao tentar fazer emprestimo de um livro já emprestado ")
+    public void shouldNotLoanLoanedBook() throws Exception {
+        // cenário
+        LoanDTO dto = createNewLoanDTO();
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given(bookService.getBookByIsbn("123")).willReturn(Optional.of(createNewBook()));
+
+        BDDMockito.given(loanService.save(Mockito.any(Loan.class)))
+                .willThrow(new BusinessException("Book already loaned"));
+
+        // execução
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(LOAN_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("errors", Matchers.hasSize(1)))
+                .andExpect(jsonPath("errors[0]").value("Book already loaned"));
 
     }
 
