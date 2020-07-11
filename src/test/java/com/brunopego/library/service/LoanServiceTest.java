@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
@@ -103,6 +104,25 @@ public class LoanServiceTest {
         assertThat(result.get().getCustomer()).isEqualTo(loan.getCustomer());
         assertThat(result.get().getBook()).isEqualTo(loan.getBook());
         assertThat(result.get().getLoanDate()).isEqualTo(loan.getLoanDate());
+
+    }
+
+    @Test
+    @DisplayName("Deve atualizar um empréstimo")
+    public void shouldUpdateLoan() {
+        // cenário
+        Loan loan = createNewLoan();
+        loan.setId(1L);
+        loan.setReturned(true);
+
+        Mockito.when(repository.save(loan)).thenReturn(loan);
+
+        // execução
+        Loan updatedLoan = service.update(loan);
+
+        // verificação
+        assertThat(updatedLoan.getReturned()).isTrue();
+        verify(repository).save(loan);
 
     }
 
