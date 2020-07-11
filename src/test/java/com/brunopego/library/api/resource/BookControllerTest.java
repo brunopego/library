@@ -233,7 +233,7 @@ public class BookControllerTest {
 
     @Test
     @DisplayName("Deve retornar not found ao tentar atualizar um livro inexistente")
-    public void shouldNotUpdateInexistenBook() throws Exception {
+    public void shouldNotUpdateInexistentBook() throws Exception {
         // cenário
         Long id = 1L;
         Book book = createNewBook();
