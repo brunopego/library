@@ -1,10 +1,13 @@
 package com.brunopego.library.service.impl;
 
+import com.brunopego.library.api.dto.LoanFilterDTO;
 import com.brunopego.library.exception.BusinessException;
 import com.brunopego.library.model.entity.Loan;
 import com.brunopego.library.model.repository.LoanRepository;
 import com.brunopego.library.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -31,5 +34,10 @@ public class LoanServiceImpl implements LoanService {
     @Override
     public Loan update(Loan loan) {
         return repository.save(loan);
+    }
+
+    @Override
+    public Page<Loan> find(LoanFilterDTO filterDTO, Pageable pageable) {
+        return repository.findByBookIsbnOrCustomer(filterDTO.getIsbn(), filterDTO.getCustomer(), pageable);
     }
 }
