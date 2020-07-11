@@ -1,6 +1,7 @@
 package com.brunopego.library.api.resource;
 
 import com.brunopego.library.api.dto.LoanDTO;
+import com.brunopego.library.api.dto.ReturnedLoanDTO;
 import com.brunopego.library.model.entity.Book;
 import com.brunopego.library.model.entity.Loan;
 import com.brunopego.library.service.BookService;
@@ -30,6 +31,14 @@ public class LoanController {
         Loan loan = Loan.builder().book(book).customer(dto.getCustomer()).loanDate(LocalDate.now()).build();
         loan = loanService.save(loan);
         return  loan.getId();
+    }
+
+    @PatchMapping("{id}")
+    public void returnBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO dto) {
+        Loan loan = loanService.getById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        loan.setReturned(dto.getReturned());
+        loanService.update(loan);
     }
 
 }
